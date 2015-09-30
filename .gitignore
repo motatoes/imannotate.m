@@ -18,7 +18,8 @@ _old/
 # Simulink Code Generation
 slprj/
 
-
+# Ignoring the settings file
+settings.m
 
 
 
