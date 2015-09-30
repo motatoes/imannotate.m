@@ -28,5 +28,5 @@ SETTINGS.MARKERS_PATH = 'PATH/TO/WHERE/MARKER/MAT/FILES/WILL/BE/STORED/';
 
 % == SETTINGS.MARKERS_FILE_SUFFIX ==
 % The prefix for all the marker data (mat files)
-SETTINGS.MARKERS_FILE_SUFFX = '_markers_new.mat';
+SETTINGS.MARKERS_FILE_SUFFIX = '_markers_new.mat';
 
