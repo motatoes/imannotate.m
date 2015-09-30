@@ -128,8 +128,13 @@ classdef  MarkerCollection < handle
         
         % Return the positions of all the markers (usually to store them)
         function res = serialize(self)
+            % Get the size of the current image to save it in the
+            % serialized object
+            imgsize = size(getimage(self.fighandle));
+                        
             res = struct();
             res.categories = self.categories;
+            res.size = imgsize;
             
             for i=1:length(self.categories)
                 label = self.categories(i).label;
