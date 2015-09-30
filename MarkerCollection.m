@@ -156,11 +156,13 @@ classdef  MarkerCollection < handle
                 error('Function called with wrong datatype %s, expected: %s', class(mat), 'imroi sublass')
             end
             
+            count = 1;
             for i = 1:length(mat)
                 h = mat(i);
                 % Check if it wasn't deleted
                 if (isvalid(h))
                     data{i} = h.getPosition();
+                    count = count + 1;
                 end
             end
         end
