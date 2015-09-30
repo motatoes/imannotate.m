@@ -56,8 +56,6 @@ function main_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 
-
-
 % Loading some variables from the settings file (SETTINGS struct)
 settings
 %===========================
@@ -100,8 +98,6 @@ function varargout = main_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
-
-
 % --- Executes on selection change in ImagesListBox.
 function ImagesListBox_Callback(hObject, eventdata, handles)
 % hObject    handle to ImagesListBox (see GCBO)
@@ -129,7 +125,8 @@ filename = strcat(handles.SETTINGS.MARKERS_PATH, '\', items{index_selected}, mar
 handles.markers.reset();
 
 if exist(filename, 'file')
-    load(filename);
+    markerPositions = getSerializedObject( filename  );
+%     load(filename);
     
     handles.markers.loadMarkers(markerPositions);
 %     [handles.exudates, handles.haemorhages, handles.microaneurysms ] = show_markers(exudate_positions, haemorhage_positions, microaneurysm_positions, gca);
