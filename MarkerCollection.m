@@ -124,6 +124,11 @@ classdef  MarkerCollection < handle
             
             % Set the colour
             h.setColor(colour);
+            % Make the object deletable
+            hChildren = get(h, 'Children');
+            hcmenu = get(hChildren(1),'UIContextMenu');    
+            delcallback = @(h,a) delete(h);
+            uimenu(hcmenu, 'Label', 'Delete', 'Callback', delcallback);
         end
         
         % Return the positions of all the markers (usually to store them)
