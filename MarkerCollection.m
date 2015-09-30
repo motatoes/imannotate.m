@@ -97,7 +97,7 @@ classdef  MarkerCollection < handle
         function h=drawMarker(self, shape, varargin)
             p = inputParser;
             addParameter(p, 'colour', 'blue');
-            addParameter(p, 'position', [])
+            addParameter(p, 'position', []);
             parse(p, varargin{:})
             
             figure(self.fighandle);
