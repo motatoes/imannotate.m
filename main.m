@@ -123,7 +123,7 @@ imshow( img );
 
 % load all the marker variables (exudates, microaneurysms, haemorhages) [if
 % exists]
-markers_prefix = handles.SETTINGS.MARKERS_FILE_PREFIX;
+markers_prefix = handles.SETTINGS.MARKERS_FILE_SUFFIX;
 filename = strcat(handles.SETTINGS.MARKERS_PATH, '\', items{index_selected}, markers_prefix);
 
 handles.markers.reset();
@@ -219,7 +219,7 @@ items = get(handles.ImagesListBox, 'string');
 index_selected = get(handles.ImagesListBox,'Value');
 
 markers_path = handles.SETTINGS.MARKERS_PATH;
-markers_prefix = handles.SETTINGS.MARKERS_FILE_PREFIX;
+markers_prefix = handles.SETTINGS.MARKERS_FILE_SUFFIX;
 filename = strcat(markers_path, '\', items{index_selected}, markers_prefix);
 % save(filename, 'exudate_positions', 'microaneurysm_positions', 'haemorhage_positions');
 markerPositions = handles.markers.serialize();
