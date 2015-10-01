@@ -127,7 +127,7 @@ classdef  MarkerCollection < handle
             % Make the object deletable
             hChildren = get(h, 'Children');
             hcmenu = get(hChildren(1),'UIContextMenu');    
-            delcallback = @(h,a) delete(h);
+            delcallback = @(h2,a) delete(h);
             uimenu(hcmenu, 'Label', 'Delete', 'Callback', delcallback);
         end
         
