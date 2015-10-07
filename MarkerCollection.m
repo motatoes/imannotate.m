@@ -7,7 +7,7 @@ classdef  MarkerCollection < handle
         % This be a struct of with a key for all the categories where the
         % key is the category label and the value is a vector of references
         % to the handle objects
-        ROIhandles;
+        ROIhandles; % Stores references to various handle objects that are drawn
         categories; % Struct array defines the categories and their respective props
         fighandle; % The figure handle
     end
@@ -25,31 +25,28 @@ classdef  MarkerCollection < handle
         
         function reset(self)
             categories = self.categories;
-
             for i=1:length(categories)
                 label = categories(i).label;
-                
                 if strcmp(label, 'categories')
-                    error('The label "categories" is reserved and cant be used, please chose another name')
+                    error('The label "categories" is reserved and cant be used, please chose another name');
                 end
                 self.ROIhandles.(label) = [];
             end
-            
         end
         
         function setFigureHandle(self, newhandle)
             self.fighandle = newhandle;
         end
         
-        function addMarker(self, category)
-            
+        function addMarker(self, label)
             % Select the right figure for the marker display
             figure(self.fighandle);
             
             % Find the categoy in our metadata to get all its info
             categoryFound = false;
             for i=1:length(self.categories)
-                if (strcmp(self.categories(i).label, category))
+                if (strcmp(self.categories(i).label, label))
+                    idx = i;
                     categoryFound = true;
                     shape = self.categories(i).shape;
                     colour = self.categories(i).colour;    
@@ -58,38 +55,41 @@ classdef  MarkerCollection < handle
             
             % Category not found :(  exit
             if (~categoryFound)
-                error('A nonexistant category was passed as a parameter. Category passed: %s', category)
+                error('A nonexistant category was passed as a parameter. Category passed: %s', label)
             end
 
             % Now that we have the sape, lets draw it on the plot and
             % get its handle
-            h = self.drawMarker(shape, 'colour', colour);
+             tags =  self.categories(idx).tags;
+            shapehndl = self.drawMarker(shape, 'colour', colour, 'tags', tags);
             
             % Append the handle to the right category location
-            self.ROIhandles.(category) = [self.ROIhandles.(category) h];
+            self.ROIhandles.(label) = [self.ROIhandles.(label) shapehndl];            
         end
-
+        
         % This function displas markers from a 
         function loadMarkers(self, markerPositions)
-            % Loop over allt he categories
+            % Loop over all the categories
             for i=1:length(markerPositions.categories)
-                
                 % Get the category label name
-                category = markerPositions.categories(i).label;
+                label = markerPositions.categories(i).label;
                 
                 % Get the shape and colour of this class
                 shape = markerPositions.categories(i).shape;
                 colour = markerPositions.categories(i).colour;
-                
-                for j=1:length(markerPositions.(category).data)
+                tags = self.categories(i).tags;
+%                 tags={};
+                for j=1:length(markerPositions.(label).data)
                     % Get its position
-                    pos = markerPositions.(category).data{j};
-                    
+                    pos = markerPositions.(label).data{j};
+
+                    tagstruct = markerPositions.(label).tags{j};
+
                     % Display the marker
-                    h = self.drawMarker( shape, 'position', pos,'colour', colour);
+                    h = self.drawMarker( shape, 'position', pos,'colour', colour, 'tags',  tags, 'tagstruct', tagstruct);
                     
                     % Append it to the internal list of handles
-                    self.ROIhandles.(category) = [self.ROIhandles.(category) h];
+                    self.ROIhandles.(label) = [self.ROIhandles.(label) h];
                 end
             end
         end
@@ -98,12 +98,14 @@ classdef  MarkerCollection < handle
             p = inputParser;
             addParameter(p, 'colour', 'blue');
             addParameter(p, 'position', []);
+            addParameter( p, 'tagstruct', struct() );
             parse(p, varargin{:})
             
             figure(self.fighandle);
             
             colour = p.Results.colour;
             position = p.Results.position;
+            tagstruct = p.Results.tagstruct;
             
             if ( strcmp(shape, 'rectangle') )
                 h = imrect(gca, position);
@@ -126,9 +128,44 @@ classdef  MarkerCollection < handle
             h.setColor(colour);
             % Make the object deletable
             hChildren = get(h, 'Children');
-            hcmenu = get(hChildren(1),'UIContextMenu');    
-            delcallback = @(h2,a) delete(h);
+            hcmenu = get(hChildren(1),'UIContextMenu');
+            delcallback = @(h2, a) delete(h);
             uimenu(hcmenu, 'Label', 'Delete', 'Callback', delcallback);
+            
+            % Add the tags menu callback
+            tag_keys = fieldnames( tagstruct );
+            if (length(tag_keys) > 0)
+                tagscallback = @(menuhndl, a) self.setTags(menuhndl);
+                tagsmenu = uimenu(hcmenu, 'Label',  'tags', 'Tag', 'tagsmenu');
+                
+                for i=1:length(tag_keys)
+                    tag_key =  tag_keys{i};
+                    chk = tagstruct.( tag_key );
+                    if (chk == 1)
+                        checked = 'on';
+                    else
+                        checked = 'off';
+                    end
+                    tm = uimenu(tagsmenu, 'Label', tag_key, 'Callback',  tagscallback, 'Checked', checked);
+                    set(tm, 'Tag', tag_key);
+                end
+            end
+        end
+        
+        function setTags(self, menuhndl)
+%             tags = self.categories(idx).tags
+            
+            chk = get(menuhndl, 'checked');
+            if (strcmp(chk, 'on'))
+                % need to set it off and take action
+                disp(' This menu is checked');
+                set(menuhndl, 'checked', 'off');                
+            elseif (strcmp(chk, 'off'))
+                % Need to set it on and take action
+                disp('This menu item is not checked');
+                set(menuhndl', 'checked', 'on');
+            end
+            
         end
         
         % Return the positions of all the markers (usually to store them)
@@ -136,24 +173,66 @@ classdef  MarkerCollection < handle
             % Get the size of the current image to save it in the
             % serialized object
             imageSize = size(getimage(self.fighandle));
-                        
+            
             res = struct();
             res.categories = self.categories;
             res.imageSize = imageSize;
             
             for i=1:length(self.categories)
+                
                 label = self.categories(i).label;
                 shape = self.categories(i).shape;
                 colour = self.categories(i).colour;
+                tag_names = self.categories(i).tags;
+                
+                ROItags = {};
+                for  j = 1:length(self.ROIhandles.(label) )
+                    tagvals = self.getTagsFromHandle( self.ROIhandles.(label)(j), tag_names );
+                    ROItags{length(ROItags)+1} = tagvals; 
+                end
                 
                 res.(label) = struct();
                 res.(label).shape = shape;
                 res.(label).colour = colour;
+                res.(label).tags= ROItags;
                 res.(label).data = self.handles2matrix( self.ROIhandles.(label) );
             end
         end
         
-        
+        function tagstruct = getTagsFromHandle(self, shp_hndl, tag_names)
+            tagstruct = struct();
+            
+            count = 1;
+            
+
+            for i=1:length(tag_names)
+                tagname = tag_names{i};
+                if (isvalid(shp_hndl))
+
+                    hChildren = get(shp_hndl, 'Children');
+                    hcmenu = get(hChildren(1),'UIContextMenu');
+
+                    tagmenu = findobj(hcmenu, 'tag', tagname);
+
+                    if ( ~isempty(tagmenu) )
+                        count = count + 1;
+                        chk = get(tagmenu, 'checked');
+                        if ( strcmp(chk, 'on') )
+                            tagstruct.(tagname) = 1;
+                        else
+                            tagstruct.(tagname) = 0;
+                        end
+                    else
+                        tagstruct.(tagname) = 0;
+                    end
+                else
+                    tagstruct.(tagname) = 0;
+                end
+            end
+            
+        end
+                
+            
         % == loosely related functions ==%
         function data = handles2matrix(self, mat)
             data = {};

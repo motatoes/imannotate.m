@@ -52,6 +52,10 @@ function main_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to main (see VARARGIN)
 
+
+% Add the utility functions path
+addpath util
+
 % Choose default command line output for main
 handles.output = hObject;
 
