@@ -57,10 +57,10 @@ classdef  MarkerCollection < handle
             if (~categoryFound)
                 error('A nonexistant category was passed as a parameter. Category passed: %s', label)
             end
-
+            
             % Now that we have the sape, lets draw it on the plot and
             % get its handle
-             tags =  self.categories(idx).tags;
+            tags =  self.categories(idx).tags;
             shapehndl = self.drawMarker(shape, 'colour', colour, 'tags', tags);
             
             % Append the handle to the right category location
@@ -79,14 +79,21 @@ classdef  MarkerCollection < handle
                 colour = markerPositions.categories(i).colour;
                 tags = self.categories(i).tags;
 %                 tags={};
-                for j=1:length(markerPositions.(label).data)
+                defaultTagStruct = self.getDefaultTagStruct(i);
+                for j=1:length( markerPositions.(label).data )
                     % Get its position
                     pos = markerPositions.(label).data{j};
-
-                    tagstruct = markerPositions.(label).tags{j};
-
+                    
+                    % If the tags exist in that stored variable
+                    if ( ismember('tags', fieldnames( markerPositions.(label)) ) ) 
+                        tagstruct = markerPositions.(label).tags{j};
+                    else
+                        % Create a defaults tag struct with all zeros
+                        tagstruct = defaultTagStruct;
+                    end
+                    
                     % Display the marker
-                    h = self.drawMarker( shape, 'position', pos,'colour', colour, 'tags',  tags, 'tagstruct', tagstruct);
+                        h = self.drawMarker( shape, 'position', pos,'colour', colour, 'tags',  tags, 'tagstruct', tagstruct);
                     
                     % Append it to the internal list of handles
                     self.ROIhandles.(label) = [self.ROIhandles.(label) h];
@@ -150,6 +157,7 @@ classdef  MarkerCollection < handle
                     set(tm, 'Tag', tag_key);
                 end
             end
+            
         end
         
         function setTags(self, menuhndl)
@@ -164,6 +172,16 @@ classdef  MarkerCollection < handle
                 % Need to set it on and take action
                 disp('This menu item is not checked');
                 set(menuhndl', 'checked', 'on');
+            end
+            
+        end
+        
+        function dtagstruct = getDefaultTagStruct(self, idx)
+            taglist = self.categories(idx).tags;
+            dtagstruct = struct();
+            
+            for i=1:length(taglist);
+                dtagstruct.(taglist{i}) = 0;
             end
             
         end
