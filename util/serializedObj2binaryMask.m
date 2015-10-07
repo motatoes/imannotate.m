@@ -27,6 +27,7 @@ function [ varargout ] = serializedObj2binaryMask( serializedObj, varargin )
         shape = categories(i).shape;
         data = serializedObj.(label).data;
         
+        %***TODO: cell array should be accumulated and not overwritten===
         [mask, cellarr] = dataExtract( data, shape, outputsize, scaleratio );
         resmask(mask) = i;
         
