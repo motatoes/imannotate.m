@@ -9,28 +9,43 @@ function [ varargout ] = serializedObj2binaryMask( serializedObj, varargin )
 % (default=1)
 % *outputsize: parameter that controls the output size of the resulting
 % image
-
+    
     categories = serializedObj.categories;
     imsize = serializedObj.imageSize;
-
     
     p = inputParser();
-    addParameter(p, 'scaleratio',1);
-    addParameter(p, 'outputsize', imsize);
+    addParameter( p, 'scaleratio',1);
+    addParameter( p, 'outputsize', imsize);
+    addParameter( p, 'labelFilter', {categories.label} );
+    addParameter( p, 'tagsFilter', {} );
+    
     parse(p, varargin{:});
     scaleratio = p.Results.scaleratio;
     outputsize = p.Results.outputsize;
+    labelsFilter = p.Results.labelFilter;
+    tagsFilter = p.Results.tagsFilter;
     
     resmask = zeros( [outputsize(1), outputsize(2)] ) ;
-    for i=1:length(categories)
+    for i = 1:length(categories)
         label = categories(i).label;
-        shape = categories(i).shape;
-        data = serializedObj.(label).data;
         
-        %***TODO: cell array should be accumulated and not overwritten===
-        [mask, cellarr] = dataExtract( data, shape, outputsize, scaleratio );
-        resmask(mask) = i;
-        
+        if ( ismember(label, labelsFilter))
+            shape = categories(i).shape;
+            data = serializedObj.(label).data;
+            tags = serializedObj.(label).tags;
+            
+            if ( ismember(label, fieldnames(tagsFilter) ) )
+                data = filterData( data, tags, tagsFilter.(label) );
+            end
+            
+            % Initialize cell array
+            cellarr = {};
+            % Get the cell array and the mask
+            [mask, CA] = dataExtract( data, shape, outputsize, scaleratio );
+            % append the results of this iteration
+            resmask(mask) = i;
+            cellarr{ length(cellarr)+1 } = CA;
+        end        
     end
     
     
@@ -40,8 +55,8 @@ function [ varargout ] = serializedObj2binaryMask( serializedObj, varargin )
         varargout{1} = resmask;
         varargout{2} = cellarr;
     end
-        
-
+    
+    
     function [mask, cellarray] = dataExtract(data, shape, outsize, scaleratio)
         
         % Create an invisible figure to draw shapes and get corresponding
@@ -74,13 +89,11 @@ function [ varargout ] = serializedObj2binaryMask( serializedObj, varargin )
         close(hndl);
         
         
-        
     function shp = drawShape(hndl, shape, position)
         
         % Set the current figure
-        set(0, 'currentfigure', hndl);  %# for figures
-
-
+        set( 0, 'currentfigure', hndl );  %# for figures
+        
         if ( strcmp(shape, 'rectangle') )
             shp = imrect(gca, position);
         elseif ( strcmp(shape, 'ellipse') )
@@ -92,8 +105,34 @@ function [ varargout ] = serializedObj2binaryMask( serializedObj, varargin )
         elseif ( strcmp(shape, 'polygon') )
             shp = impoly(gca, position);
         end
-        
-      
+    
 
+
+        function tagstruct = categories2tagstruct( categories )
+            tagstruct = struct();
+            labels = { categories.label };
+            
+            for i =1:length(labels)
+                tagstruct.( labels{i} ) = categories.( labels(i) ).tags;
+            end
+            
+            
+        function filteredData =  filterData( data, tags, tagsCatFilter )
+            
+            % Labels in the tags struct
+            filteredData = {};
+            for i = 1:length(tags)
+                tagstruct = tags{i};
+                
+                for j=1:length(tagsCatFilter)
+                    taglabel = tagsCatFilter{j};
+                    if ( tagstruct.( taglabel ) == 1 )
+                        filteredData{ length(filteredData)+1 } = data{i} ;
+                        break;
+                    end
+                end
+                
+            end
+            
             
             
