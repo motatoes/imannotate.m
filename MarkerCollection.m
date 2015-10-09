@@ -84,6 +84,12 @@ classdef  MarkerCollection < handle
                     % Get its position
                     pos = markerPositions.(label).data{j};
                     
+                    % Invalid position of it's an empty matrix
+                    % TODO: Find out why some [] positions are appearing
+                    if isempty(pos)
+                        continue;
+                    end
+                    
                     tagstruct = defaultTagStruct;
                     % If the tags exist in that stored variable
                     if ( ismember('tags', fieldnames( markerPositions.(label)) ) ) 
