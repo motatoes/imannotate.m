@@ -67,7 +67,7 @@ classdef  MarkerCollection < handle
             self.ROIhandles.(label) = [self.ROIhandles.(label) shapehndl];            
         end
         
-        % This function displas markers from a 
+        % This function displays markers from a 
         function loadMarkers(self, markerPositions)
             % Loop over all the categories
             for i=1:length(markerPositions.categories)
@@ -84,16 +84,21 @@ classdef  MarkerCollection < handle
                     % Get its position
                     pos = markerPositions.(label).data{j};
                     
+                    tagstruct = defaultTagStruct;
                     % If the tags exist in that stored variable
                     if ( ismember('tags', fieldnames( markerPositions.(label)) ) ) 
-                        tagstruct = markerPositions.(label).tags{j};
-                    else
-                        % Create a defaults tag struct with all zeros
-                        tagstruct = defaultTagStruct;
+                        % Merge default tag values with those stored in
+                        % variable
+                        tmp = markerPositions.(label).tags{j};
+                        tmp2 = fieldnames(tmp);
+                        for ts = 1:length(tmp2)
+                            key = tmp2{ts};
+                            tagstruct.(key) = tmp.(key);
+                        end
                     end
                     
                     % Display the marker
-                        h = self.drawMarker( shape, 'position', pos,'colour', colour, 'tags',  tags, 'tagstruct', tagstruct);
+                      h = self.drawMarker( shape, 'position', pos,'colour', colour, 'tags',  tags, 'tagstruct', tagstruct);
                     
                     % Append it to the internal list of handles
                     self.ROIhandles.(label) = [self.ROIhandles.(label) h];
