@@ -17,7 +17,7 @@ function [ varargout ] = serializedObj2binaryMask( serializedObj, varargin )
     addParameter( p, 'scaleratio',1);
     addParameter( p, 'outputsize', imsize);
     addParameter( p, 'labelFilter', {categories.label} );
-    addParameter( p, 'tagsFilter', {} );
+    addParameter( p, 'tagsFilter', struct() );
     
     parse(p, varargin{:});
     scaleratio = p.Results.scaleratio;
