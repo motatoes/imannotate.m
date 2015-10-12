@@ -49,7 +49,7 @@ classdef  MarkerCollection < handle
                     idx = i;
                     categoryFound = true;
                     shape = self.categories(i).shape;
-                    colour = self.categories(i).colour;    
+                    colour = self.categories(i).colour;
                 end
             end
             
