@@ -26,6 +26,9 @@ function [ varargout ] = serializedObj2binaryMask( serializedObj, varargin )
     tagsFilter = p.Results.tagsFilter;
     
     resmask = zeros( [outputsize(1), outputsize(2)] ) ;
+    % Initialize cell array
+    cellarr = struct();
+    
     for i = 1:length(categories)
         label = categories(i).label;
         
@@ -38,13 +41,12 @@ function [ varargout ] = serializedObj2binaryMask( serializedObj, varargin )
                 data = filterData( data, tags, tagsFilter.(label) );
             end
             
-            % Initialize cell array
-            cellarr = {};
+
             % Get the cell array and the mask
             [mask, CA] = dataExtract( data, shape, outputsize, scaleratio );
             % append the results of this iteration
             resmask(mask) = i;
-            cellarr{ length(cellarr)+1 } = CA;
+            cellarr.(label) = CA;
         end        
     end
     
