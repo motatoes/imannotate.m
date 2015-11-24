@@ -21,7 +21,7 @@ classdef  MarkerCollection < handle
             
             % Reset the markers to defaults
             obj.reset()
-        end    
+        end   
         
         function reset(self)
             categories = self.categories;
@@ -44,7 +44,7 @@ classdef  MarkerCollection < handle
             
             % Find the categoy in our metadata to get all its info
             categoryFound = false;
-            for i=1:length(self.categories)
+             for i=1:length(self.categories)
                 if (strcmp(self.categories(i).label, label))
                     idx = i;
                     categoryFound = true;
@@ -61,7 +61,8 @@ classdef  MarkerCollection < handle
             % Now that we have the sape, lets draw it on the plot and
             % get its handle
             tags =  self.categories(idx).tags;
-            shapehndl = self.drawMarker(shape, 'colour', colour, 'tags', tags);
+            defaultTagStruct = self.getDefaultTagStruct(idx);
+            shapehndl = self.drawMarker(shape, 'colour', colour, 'tagstruct', defaultTagStruct);
             
             % Append the handle to the right category location
             self.ROIhandles.(label) = [self.ROIhandles.(label) shapehndl];            
@@ -104,7 +105,7 @@ classdef  MarkerCollection < handle
                     end
                     
                     % Display the marker
-                      h = self.drawMarker( shape, 'position', pos,'colour', colour, 'tags',  tags, 'tagstruct', tagstruct);
+                      h = self.drawMarker( shape, 'position', pos,'colour', colour, 'tagstruct', tagstruct);
                     
                     % Append it to the internal list of handles
                     self.ROIhandles.(label) = [self.ROIhandles.(label) h];
@@ -129,6 +130,10 @@ classdef  MarkerCollection < handle
                 h = imrect(gca, position);
             elseif ( strcmp(shape, 'ellipse') )
                 h = imellipse(gca, position);
+            elseif ( strcmp(shape, 'circle') ) % circles are ellipses that have same radius 1 and radius 2
+                % We just use a position constraint to ensure that it will
+                % always be a circle while resizing :D
+                h = imellipse(gca, position, 'PositionConstraintFcn', @(pos) [pos(1) pos(2) max(pos(3:4)) max(pos(3:4))]);
             elseif ( strcmp(shape, 'line') )
                 h = imline(self.fighandle);
             elseif ( strcmp(shape, 'point') )
@@ -190,11 +195,9 @@ classdef  MarkerCollection < handle
         function dtagstruct = getDefaultTagStruct(self, idx)
             taglist = self.categories(idx).tags;
             dtagstruct = struct();
-            
             for i=1:length(taglist);
                 dtagstruct.(taglist{i}) = 0;
             end
-            
         end
         
         % Return the positions of all the markers (usually to store them)
