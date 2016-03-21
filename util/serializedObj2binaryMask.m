@@ -99,9 +99,9 @@ function [ varargout ] = serializedObj2binaryMask( serializedObj, varargin )
         if ( strcmp(shape, 'rectangle') )
             shp = imrect(gca, position);
         elseif ( strcmp(shape, 'ellipse') )
-            shp = imellipse(gca, position);
+            shp = imellipse(gca, round(position));
         elseif ( strcmp(shape, 'circle') ) % A circle is just an ellipse with radius1=radius2 and this is assumed to be handeled in the GUI interface etc.
-            shp = imellipse(gca, position);
+            shp = imellipse(gca, round(position));
         elseif ( strcmp(shape, 'line') )
             shp = imline(self.fighandle);
         elseif ( strcmp(shape, 'point') )
