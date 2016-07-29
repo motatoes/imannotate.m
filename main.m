@@ -22,7 +22,7 @@ function varargout = main(varargin)
 
 % Edit the above text to modify the response to help main
 
-% Last Modified by GUIDE v2.5 25-Sep-2015 12:42:55
+% Last Modified by GUIDE v2.5 02-Dec-2015 12:05:24
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -228,20 +228,24 @@ save(filename, 'markerPositions');
 
 
 
-% --- Executes on button press in greenChannelButton.
-function greenChannelButton_Callback(hObject, eventdata, handles)
-% hObject    handle to greenChannelButton (see GCBO)
+% --- Executes on button press in visualizeBtn.
+function visualizeBtn_Callback(hObject, eventdata, handles)
+% hObject    handle to visualizeBtn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-figure(handles.markers.fighandle);
-imshow(handles.currentImage(:, :, 2));
-% Update handles structure
-guidata(hObject, handles);
-refreshdata
+addpath util;
+img = handles.currentImage;
+res = img;
+markerPositions = handles.markers.serialize();
+mask = serializedObj2binaryMask(markerPositions);
+
+outline = bwperim(mask);
+res(outline) = 1;
+
+figure; imshow(res);
 
 
 %===================Dynamic callbacks ==============================%
 function addMarker(hObject, eventdata, handles, category)
     handles.markers.addMarker(category);
 %=================== User Funcations ==============================%
-
