@@ -21,7 +21,7 @@ classdef  MarkerCollection < handle
             
             % Reset the markers to defaults
             obj.reset()
-        end   
+        end
         
         function reset(self)
             categories = self.categories;
@@ -133,7 +133,7 @@ classdef  MarkerCollection < handle
             elseif ( strcmp(shape, 'circle') ) % circles are ellipses that have same radius 1 and radius 2
                 % We just use a position constraint to ensure that it will
                 % always be a circle while resizing :D
-                h = imellipse(gca, position, 'PositionConstraintFcn', @(pos) [pos(1) pos(2) max(pos(3:4)) max(pos(3:4))]);
+                h = imcircle( gca, position);
             elseif ( strcmp(shape, 'line') )
                 h = imline(self.fighandle);
             elseif ( strcmp(shape, 'point') )
