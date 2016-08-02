@@ -58,10 +58,29 @@ function imannotate_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for imannotate
 handles.output = hObject;
+if (nargin == 3)
+    [fname fpath] = uigetfile('*.m','Pick settings file');
+    if (fpath == 0)
+        error('You must specify a settings file .. exiting');
+    end
+    % Extracting only the path and the filename without extension
+    [fpath fnamenoext fext] = fileparts([fpath fname]);
+    addpath(fpath);
+    settings_file = [fnamenoext];
+    
+elseif (nargin == 4)
+    [fpath fnamenoext fext] = fileparts(varargin{1});
+    addpath(fpath);
+    settings_file = [fnamenoext];
+    % Loading some variables from the settings file (SETTINGS class)
+else
+    error('%s\n%s\%s', 'Usage: imannotate', ...
+                       '       imannotate <settings_file_name>', ...
+           'to see example settings files type edit imannotate.settings.SquaresExample');
+end
 
-
-% Loading some variables from the settings file (SETTINGS struct)
-SETTINGS = imannotate.Imannotate_Settings();
+SETTINGS = eval(settings_file);
+    
 %===========================
 
 handles.SETTINGS = SETTINGS;
