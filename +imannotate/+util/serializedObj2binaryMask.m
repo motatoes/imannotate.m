@@ -77,9 +77,10 @@ function [ varargout ] = serializedObj2binaryMask( serializedObj, varargin )
             position = data{i}*scaleratio;
             
             % Draw the shape on the figure
-            shp = drawShape(hndl, shape, position);
-            BW = createMask(shp, im_hndl);
-            
+            % shp = drawShape(hndl, shape, position);
+            % BW = createMask(shp, im_hndl);
+            BW = drawShape(hndl, shape, position, outsize);
+
             % Get the corresponding mask
             resMask=  resMask | BW;
             resCellArray{i} = find(BW);
@@ -90,6 +91,34 @@ function [ varargout ] = serializedObj2binaryMask( serializedObj, varargin )
         % Close the invisible figure
         close(hndl);
         
+function BW = drawShape(hndl, shape, position, outsize)
+
+    % Set the current figure
+    set( 0, 'currentfigure', hndl );  %# for figures
+
+    BW = zeros( [outsize(1), outsize(2)] );
+
+    if ( strcmp(shape, 'rectangle') )
+        shp = vision.ShapeInserter('Shape', 'Rectangles', 'FillColorSource', 'Property', 'Fill', true, 'FillColor', 'Custom', 'CustomFillColor', [1]);
+        BW = step(shp, BW, floor(position ));
+    elseif ( strcmp(shape, 'ellipse') )
+        % Elipses are not supported be shapeinserter so we use imellipse on
+        % a hidden figure .. (temporary hack)
+        hndl = figure('visible', 'off');
+        im_hndl = imshow(false(outsize));
+        shp = imellipse(gca, position);
+        BW = createMask(shp, im_hndl);
+    elseif ( strcmp(shape, 'circle') ) % A circle is just an ellipse with radius1=radius2 and this is assumed to be handeled in the GUI interface etc.
+        shp = vision.ShapeInserter('Shape', 'Circles', 'FillColorSource', 'Property', 'Fill', true, 'FillColor', 'Custom', 'CustomFillColor', [1]);
+        r = (position(3)/2); % Radius
+        BW = step(shp, BW, round([position(1)+r, position(2)+r, r]) );
+    elseif ( strcmp(shape, 'line') )
+        shp = vision.ShapeInserter('Shape', 'Lines', 'FillColorSource', 'Property', 'Fill', true, 'FillColor', 'Custom', 'CustomFillColor', [1]);
+        BW = step(shp, BW, round(position) );
+    elseif ( strcmp(shape, 'polygon') )
+        shp = vision.ShapeInserter('Shape', 'Polygons', 'FillColorSource', 'Property', 'Fill', true, 'FillColor', 'Custom', 'CustomFillColor', [1]);
+        BW = step(shp, BW, round(position) );
+    end
         
     function shp = drawShape(hndl, shape, position)
         
