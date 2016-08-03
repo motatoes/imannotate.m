@@ -14,7 +14,7 @@ function [ out_bw, varargout ] = markers2image( markerspath, varargin )
     
     %  === MH replace ===
     % GT_img = imread(GT_file);
-    serializedObj = getSerializedObject(markerspath);
+    serializedObj = imannotate.util.getSerializedObject(markerspath);
     org_size = serializedObj.imageSize;
     
     % If output size was not specified make it the same as the one in the
@@ -25,7 +25,7 @@ function [ out_bw, varargout ] = markers2image( markerspath, varargin )
     
     % The ratio is the original size divided by the original size
     ratio = output_size(2) / org_size(2);
-    [GT_img, gtpixels] = serializedObj2binaryMask( serializedObj , 'scaleratio', ratio, 'outputsize', output_size, ...
+    [GT_img, gtpixels] = imannotate.util.serializedObj2binaryMask( serializedObj , 'scaleratio', ratio, 'outputsize', output_size, ...
                                                     'tagsFilter', tagsFilter);
 
     GT_img = GT_img > 0;
