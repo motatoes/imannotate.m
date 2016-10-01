@@ -120,24 +120,24 @@ function BW = drawShape(hndl, shape, position, outsize)
         BW = step(shp, BW, round(position) );
     end
         
-    function shp = drawShape(hndl, shape, position)
-        
-        % Set the current figure
-        set( 0, 'currentfigure', hndl );  %# for figures
-        
-        if ( strcmp(shape, 'rectangle') )
-            shp = imrect(gca, position);
-        elseif ( strcmp(shape, 'ellipse') )
-            shp = imellipse(gca, round(position));
-        elseif ( strcmp(shape, 'circle') ) % A circle is just an ellipse with radius1=radius2 and this is assumed to be handeled in the GUI interface etc.
-            shp = imellipse(gca, round(position));
-        elseif ( strcmp(shape, 'line') )
-            shp = imline(self.fighandle);
-        elseif ( strcmp(shape, 'point') )
-            shp = impoint(gca, position);
-        elseif ( strcmp(shape, 'polygon') )
-            shp = impoly(gca, position);
-        end
+%     function shp = drawShape(hndl, shape, position)
+%         
+%         % Set the current figure
+%         set( 0, 'currentfigure', hndl );  %# for figures
+%         
+%         if ( strcmp(shape, 'rectangle') )
+%             shp = imrect(gca, position);
+%         elseif ( strcmp(shape, 'ellipse') )
+%             shp = imellipse(gca, round(position));
+%         elseif ( strcmp(shape, 'circle') ) % A circle is just an ellipse with radius1=radius2 and this is assumed to be handeled in the GUI interface etc.
+%             shp = imellipse(gca, round(position));
+%         elseif ( strcmp(shape, 'line') )
+%             shp = imline(self.fighandle);
+%         elseif ( strcmp(shape, 'point') )
+%             shp = impoint(gca, position);
+%         elseif ( strcmp(shape, 'polygon') )
+%             shp = impoly(gca, position);
+%         end
     
 
 
