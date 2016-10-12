@@ -1,0 +1,5 @@
+testViews
+testModels
+testControllers
+
+runtests PropertiesTest
