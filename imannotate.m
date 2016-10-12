@@ -197,13 +197,14 @@ if (pathname == 0)
 end
 
 jpg =  strcat(pathname, '\*.jpg');
+jpeg = strcat(pathname, '\*.jpeg');
 tif =  strcat(pathname, '\*.tif');
 tiff = strcat(pathname, '\*.tiff');
 png =  strcat(pathname, '\*.png');
 bmp =  strcat(pathname, '\*.bmp');
 
 % Just counting the number of files returned
-imagesData = [dir(jpg); dir(tif); dir(tiff); dir(png); dir(bmp)];
+imagesData = [dir(jpg); dir(jpeg); dir(tif); dir(tiff); dir(png); dir(bmp)];
 % dirIndex = imagesData.isdir;
 % imageList = imageData.name(~isDir);
 
