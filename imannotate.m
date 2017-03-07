@@ -218,6 +218,8 @@ for i=1:length(imagesData)
 end
 
 set(handles.ImagesListBox, 'string', lst);
+set(handles.ImagesListBox, 'value', 1)
+
 % We will need the current path for later
 handles.currentPath = pathname;
 guidata(hObject,handles);
